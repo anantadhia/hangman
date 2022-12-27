@@ -4,10 +4,11 @@ import { HangmanWord } from "./HangmanWord";
 import { Keyboard } from "./Keyboard";
 import words from "./listKata.json";
 // 33:36
+function getKata() {
+  return words[Math.floor(Math.random() * words.length)];
+}
 function App() {
-  const [kataTebak, setkataTebak] = useState(() => {
-    return words[Math.floor(Math.random() * words.length)];
-  });
+  const [kataTebak, setkataTebak] = useState(getKata);
   const [tertebakHurufs, setTertebakHurufs] = useState<string[]>([]);
 
   const incorrectHuruf = tertebakHurufs.filter(
@@ -33,6 +34,21 @@ function App() {
       if (!key.match(/^[a-z]$/)) return;
 
       e.preventDefault();
+      setTertebakHurufs([]);
+      addTertebakHuruf(key);
+    };
+    document.addEventListener("keypress", handler);
+    return () => {
+      document.removeEventListener("keypress", handler);
+    };
+  }, [tertebakHurufs]);
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const key = e.key;
+      if (key !== "Enter") return;
+      setkataTebak(getKata());
+
+      e.preventDefault();
       addTertebakHuruf(key);
     };
     document.addEventListener("keypress", handler);
@@ -40,7 +56,6 @@ function App() {
       document.removeEventListener("keypress", handler);
     };
   }, []);
-
   return (
     <div
       style={{
